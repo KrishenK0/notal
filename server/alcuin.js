@@ -8,10 +8,56 @@ const superagent = require('superagent').agent();
 const cheerio = require('cheerio');
 
 const { Client } = require("@notionhq/client");
-const notion = new Client({ auth: process.env.NOTION_KEY })
+const { options } = require('superagent');
+const notion = new Client({ auth: "secret_yiPMbAbIRyOgrRxfQvTjv23krgYyhsS3Z5RzQHKNcfJ" })
 
 app.get("/", function (request, response) {
   response.send("Welcome to alcuin api !")
+})
+
+app.get("/auth", async (req, res) => {
+  if (req.query["error"]) res.status(401).send(req.query["error"]);
+  if (req.query["code"]) {
+    // encode in base 64
+    const encoded = Buffer.from(`${process.env.OAUTH_CLIENT_ID}:${process.env.OAUTH_CLIENT_SECRET}`).toString("base64");
+    
+    superagent.post("https://api.notion.com/v1/oauth/token")
+    .accept("application/json")
+    .type("application/json")
+    .set({
+      "Notion-Version": "2022-06-28",
+      'Authorization': `Basic ${encoded}`
+    }).send({
+      grant_type: "authorization_code",
+      code: req.query["code"],
+      redirect_uri: "http://localhost:8080/auth",
+    })
+    .then(data => res.json(JSON.parse(data.text)))
+    .catch(data => res.status(400).json(JSON.parse(data.response.text)));
+
+
+    
+    // const response = await fetch("https://api.notion.com/v1/oauth/token", {
+    //     method: "POST",
+    //     headers: {
+    //     Accept: "application/json",
+    //     "Content-Type": "application/json",
+    //     "Notion-Version": "2022-06-28",
+    //     Authorization: `Basic ${encoded}`
+    //   },
+    //     body: JSON.stringify({
+    //       grant_type: "authorization_code",
+    //       code: req.query["code"],
+    //       redirect_uri: "http://localhost:8080/auth",
+    //     }),
+    //   });
+      return;
+    }
+    res.sendStatus(500);
+  });
+
+app.get("/token", async (req, res) => {
+  res.json(req);
 })
 
 app.get("/week", async (req, res) => {
@@ -57,13 +103,14 @@ app.get("/calendar", async (request, response) => {
 
 
 async function getOrCreateDatabaseId() {
+  const searchPageId = await notion.search({filter: {property: "object", value: "page"}})
   const search = await notion.search({query: "Courses", filter: {property: "object", value: "database"}});
   if (search.results.length === 0) {
     try {
       const newDb = await notion.databases.create({
         parent: {
           type: "page_id",
-          "page_id": process.env.NOTION_PAGE_ID,
+          "page_id": searchPageId.results[0].id,
         },
         title: [
           {
@@ -244,8 +291,8 @@ async function getInputs(url) {
 }
 
 async function loginAlcuin(url, data) {
-  data['UcAuthentification1$UcLogin1$txtLogin'] = LOGIN;
-  data['UcAuthentification1$UcLogin1$txtPassword'] = atob(PASS);
+  data['UcAuthentification1$UcLogin1$txtLogin'] = process.env.LOGIN;
+  data['UcAuthentification1$UcLogin1$txtPassword'] = atob(process.env.PASS);
   
   try {
     const login = await superagent.post(url).send(data).set('Content-Type', 'application/x-www-form-urlencoded').set('Connection', 'keep-alive');
