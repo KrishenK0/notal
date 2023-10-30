@@ -31,30 +31,14 @@ app.get("/auth", async (req, res) => {
     }).send({
       grant_type: "authorization_code",
       code: req.query["code"],
-      redirect_uri: "http://localhost:8080/auth",
+      redirect_uri: "http://localhost:4200/login",
     })
     .then(data => res.json(JSON.parse(data.text)))
     .catch(data => res.status(400).json(JSON.parse(data.response.text)));
-
-
-    
-    // const response = await fetch("https://api.notion.com/v1/oauth/token", {
-    //     method: "POST",
-    //     headers: {
-    //     Accept: "application/json",
-    //     "Content-Type": "application/json",
-    //     "Notion-Version": "2022-06-28",
-    //     Authorization: `Basic ${encoded}`
-    //   },
-    //     body: JSON.stringify({
-    //       grant_type: "authorization_code",
-    //       code: req.query["code"],
-    //       redirect_uri: "http://localhost:8080/auth",
-    //     }),
-    //   });
       return;
     }
-    res.sendStatus(500);
+    res.sendStatus(400);
+});
   });
 
 app.get("/token", async (req, res) => {
