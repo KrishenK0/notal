@@ -4,12 +4,13 @@
 require('dotenv').config();
 const express = require("express")
 const app = express()
+const cors = require('cors');
 const superagent = require('superagent').agent();
 const cheerio = require('cheerio');
 
 const { Client } = require("@notionhq/client");
 const { options } = require('superagent');
-const notion = new Client({ auth: "secret_yiPMbAbIRyOgrRxfQvTjv23krgYyhsS3Z5RzQHKNcfJ" })
+app.use(cors());
 
 app.get("/", function (request, response) {
   response.send("Welcome to alcuin api !")
