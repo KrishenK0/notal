@@ -1,4 +1,8 @@
-import { Component } from '@angular/core';
+import { TokenService } from 'src/app/services/token.service';
+import { InfoService } from './../../services/info.service';
+import { DOCUMENT } from '@angular/common';
+import { Component, Inject } from '@angular/core';
+import { environment } from 'src/environment';
 
 @Component({
   selector: 'app-header',
@@ -6,5 +10,21 @@ import { Component } from '@angular/core';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  redirectURL = "https://www.notion.so/install-integration?response_type=code&client_id=f8844f66-125d-48b4-90ce-a2a091e945a0&redirect_uri=http%3A%2F%2Flocalhost:8080%2Ftoken&owner=user";
+
+  constructor(
+    @Inject(DOCUMENT) private document: Document,
+    public info: InfoService,
+    public token: TokenService) {}
+
+  login() {
+    this.document.location.href = "https://www.notion.so/install-integration?response_type=code&client_id=f8844f66-125d-48b4-90ce-a2a091e945a0&redirect_uri=http%3A%2F%2Flocalhost:4200%2Flogin&owner=user";
+  }
+
+  public isLogged() {
+    return localStorage.getItem(environment.AUTHID_KEY) != undefined;
+  }
+
+  toggleDropdown() {
+    document.getElementById('dropdownInformation')?.classList.toggle('hidden');
+  }
 }
