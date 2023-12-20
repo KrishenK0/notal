@@ -10,6 +10,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { CalendarComponent } from './pages/calendar/calendar.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -21,8 +22,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     CalendarComponent
   ],
   imports: [
+    CommonModule,
     HttpClientModule,
     BrowserModule,
+    FormsModule,
     ReactiveFormsModule,
     AppRoutingModule
   ],
