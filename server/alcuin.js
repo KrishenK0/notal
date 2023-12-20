@@ -314,6 +314,7 @@ async function main(LOGIN, PASS, days, initDate) {
 
   let cal, datas = [];
   let date = prevDate = new Date(initDate ?? Date.now());
+  console.log(date);
   initDate === undefined && date.setDate(date.getDate() - date.getDay());
   
   for (let i = 0; i < days; i++) {
@@ -325,11 +326,15 @@ async function main(LOGIN, PASS, days, initDate) {
       cal = await retrieveCal(date.toISOString().replace(/T.*/, '').replace(/-/g, ''));
     }
     console.log(`date: ${date.toISOString().replace(/T.*/, '').replace(/-/g, '')}`);
-    const calendar = cal.match(/<td class="GEDcellsouscategorie" align="center" bgcolor="#ffff00">.*?<\/td>/gsi).filter(x => (new RegExp(date.toISOString().replace(/T.*/, '').replace(/-/g, ''))).test(x));
-    for (const i of calendar) {
-      dayData.push(extractCalData(i, date));
-    }   
-    datas.push(dayData)
+    // console.log(cal);
+    let calendar = cal.match(/<td class="GEDcellsouscategorie" align="center" bgcolor="#[a-z0-9]+">.*?<\/td>/gsi)
+    if (calendar != null) {
+      calendar = calendar.filter(x => (new RegExp(date.toISOString().replace(/T.*/, '').replace(/-/g, ''))).test(x));
+      for (const i of calendar) {
+        dayData.push(extractCalData(i, date));
+      }   
+      datas.push(dayData)
+    }
     prevDate = new Date(date);
   }
 
@@ -395,7 +400,8 @@ async function retrieveCal(date) {
 }
 
 function extractCalData(cal, date) {
-  const course = cal.match(/<b>(.*?)<\/b>.*?<font .*?>([0-9]+H[0-9]+-[0-9]+H[0-9]+)<\/font>(.*)?<font .*?>([A-Z0-9]+|Amphi [A-Z])<\/font>(.*?)<\/td>/si);
+  const course = cal.match(/<b>(.*?)<\/b>.*?<font .*?>([0-9]+H[0-9]+-[0-9]+H[0-9]+)<\/font>(.*)?<font .*?>([A-Z0-9]+|Amphi [A-Z]|Coworking [a-zA-Z ()]+)<\/font>(.*?)<\/td>/si);
+  
   let courseArray = course[1].split(" - ");
 
   let courseType = courseArray.shift();
