@@ -7,12 +7,14 @@ const app = express()
 const cors = require('cors');
 const superagent = require('superagent').agent();
 const cheerio = require('cheerio');
+const bodyParser = require('body-parser');
 var winston = require('winston'),
     expressWinston = require('express-winston');
 
 const { Client } = require("@notionhq/client");
 const { options } = require('superagent');
-app.use(cors());
+app.use(cors(({credentials: true, origin: 'http://localhost:4200'})));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressWinston.logger({
   transports: [
     new winston.transports.Console()
@@ -27,6 +29,27 @@ app.use(expressWinston.logger({
   colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
   ignoreRoute: function (req, res) { return false; } // optional: allows to skip some log messages based on request and/or response
 }));
+app.use((req, res, next) => {
+  const { headers: { cookie } } = req;
+  if (cookie) {
+      const values = cookie.split(';').reduce((res, item) => {
+          const data = item.trim().split('=');
+          return { ...res, [data[0]]: data[1] };
+      }, {});
+      res.locals.cookie = values;
+  }
+  else res.locals.cookie = {};
+  next();
+});
+app.use('/api/*', (req, res, next) => {
+  if (res.locals.cookie['user-id'] === undefined) {
+    res.sendStatus(401);
+    return;
+  }
+  next();
+})
+
+let notion;
 
 app.get("/", function (request, response) {
   response.send("Welcome to alcuin api !")
@@ -58,8 +81,8 @@ app.get("/auth", async (req, res) => {
   });
 
 app.get("/token", async (req, res) => {
-  res.json(req);
-})
+  res.json(res.locals);
+});
 
 app.get("/week", async (req, res) => {
   // res.json(await notion.search({filter: {property: "object", value: "page"}}))
@@ -84,7 +107,7 @@ app.get("/month", async (req, res) => {
   const database = await getOrCreateDatabaseId();
   // console.log(database);
   let t = new Date();
-  const datas = await main(new Date(t.getFullYear(), t.getMonth() + 1, 0, 23, 59, 59).getDate(), t.setDate(0));
+  const datas = await main(process.env.LOGIN, process.env.PASS, new Date(t.getFullYear(), t.getMonth() + 1, 0, 23, 59, 59).getDate(), t.setDate(0));
   // console.log(datas);
   let test = [];
   console.log('[*] Synchronisation du calendrier Notion.');
@@ -99,19 +122,23 @@ app.get("/month", async (req, res) => {
 });
 
 app.get("/calendar", async (request, response) => {
-  response.json(await main());
+  response.json(await main(process.env.LOGIN, process.env.PASS));
 });
 
 
-async function getOrCreateDatabaseId() {
-  const searchPageId = await notion.search({filter: {property: "object", value: "page"}})
+async function getOrCreateDatabaseId(token, parent_id) {
+  console.log(token);
+  notion = new Client({ auth: token });
+  if (parent_id === undefined) {
+    const searchPageId = await notion.search({filter: {property: "object", value: "page"}});
+  }
   const search = await notion.search({query: "Courses", filter: {property: "object", value: "database"}});
   if (search.results.length === 0) {
     try {
       const newDb = await notion.databases.create({
         parent: {
           type: "page_id",
-          "page_id": searchPageId.results[0].id,
+          "page_id": parent_id ?? searchPageId.results[0].id,
         },
         title: [
           {
@@ -244,11 +271,11 @@ async function addRow(database_id, course) {
 const LOGIN = process.env.LOGIN;
 const PASS = process.env.PASS;
 
-async function main(days, initDate) {
+async function main(LOGIN, PASS, days, initDate) {
   console.log('[*] Connexion à Alcuin');
 
   const { data } = await getInputs('https://esaip.alcuin.com/OpDotNet/Noyau/Login.aspx');
-  await loginAlcuin('https://esaip.alcuin.com/OpDotNet/Noyau/Login.aspx', data);
+  await loginAlcuin('https://esaip.alcuin.com/OpDotNet/Noyau/Login.aspx', data, LOGIN, PASS);
 
   let cal, datas = [];
   let date = prevDate = new Date(initDate ?? Date.now());
@@ -291,9 +318,9 @@ async function getInputs(url) {
   return { data: inputs };
 }
 
-async function loginAlcuin(url, data) {
-  data['UcAuthentification1$UcLogin1$txtLogin'] = process.env.LOGIN;
-  data['UcAuthentification1$UcLogin1$txtPassword'] = atob(process.env.PASS);
+async function loginAlcuin(url, data, LOGIN, PASS) {
+  data['UcAuthentification1$UcLogin1$txtLogin'] = LOGIN;
+  data['UcAuthentification1$UcLogin1$txtPassword'] = PASS;
   
   try {
     const login = await superagent.post(url).send(data).set('Content-Type', 'application/x-www-form-urlencoded').set('Connection', 'keep-alive');

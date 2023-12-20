@@ -20,10 +20,6 @@ export class HeaderComponent {
     this.document.location.href = "https://www.notion.so/install-integration?response_type=code&client_id=f8844f66-125d-48b4-90ce-a2a091e945a0&redirect_uri=http%3A%2F%2Flocalhost:4200%2Flogin&owner=user";
   }
 
-  public isLogged() {
-    return localStorage.getItem(environment.AUTHID_KEY) != undefined;
-  }
-
   toggleDropdown() {
     document.getElementById('dropdownInformation')?.classList.toggle('hidden');
   }

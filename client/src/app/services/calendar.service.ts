@@ -7,6 +7,12 @@ import { map } from 'rxjs/internal/operators/map';
   providedIn: 'root'
 })
 export class CalendarService {
+  httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type':  'application/x-www-form-urlencoded'
+    }),
+    withCredentials: true,
+  };    
 
   constructor(private http: HttpClient) { }
 
