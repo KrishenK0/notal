@@ -78,18 +78,53 @@ app.get("/auth", async (req, res) => {
     }
     res.sendStatus(400);
 });
-  });
 
 app.get("/token", async (req, res) => {
   res.json(res.locals);
 });
 
-app.get("/week", async (req, res) => {
-  // res.json(await notion.search({filter: {property: "object", value: "page"}}))
-  const database = await getOrCreateDatabaseId();
-  // console.log(database);
-  const datas = await main(5);
-  // console.log(datas);
+app.get("/api/allPages", async (req, res) => {
+  const notion = new Client({ auth: res.locals.cookie['user-id'] });
+  let pages = await notion.search({filter: {property: "object", value: "page"}});
+  let output = [];
+  // res.json(pages);
+  for (const page of pages.results) {
+    if (page.properties.title)
+      output.push({
+        id: page.id,
+        title: page.properties.title ? page.properties.title.title[0].plain_text : 'No Title',
+        icon: page.icon ? page.icon.emoji : undefined,
+      });
+  }
+  res.json({result: output});
+});
+
+app.get("/api/database", async (req, res) => {
+  const notion = new Client({ auth: res.locals.cookie['user-id'] });
+  const search = await notion.search({query: "Courses", filter: {property: "object", value: "database"}});
+  res.json({result: search.results[0] ? search.results[0].id : false});
+})
+
+app.post("/synchronize", async (req, res) => {
+  console.log(res.locals);
+  if (req.body.parent_id) {
+    res.sendStatus(400);
+    return;
+  }
+  const database = await getOrCreateDatabaseId(res.locals.cookie['user-id'], req.body.parent_id);
+  let datas;
+  switch (req.body.type) {
+    case "week":
+      datas = await main(req.body.username, req.body.password, 5);
+      break;
+    case "month":
+      let t = new Date();
+      datas = await main(req.body.username, req.body.password, new Date(t.getFullYear(), t.getMonth() + 1, 0, 23, 59, 59).getDate(), t.setDate(0));
+      break;
+    default:
+      res.sendStatus(400);
+      return;
+  }
   let test = [];
   console.log('[*] Synchronisation du calendrier Notion.');
   for (const dataDay of datas) {

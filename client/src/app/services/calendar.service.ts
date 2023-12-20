@@ -1,7 +1,7 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { tap } from 'rxjs';
-import { map } from 'rxjs/internal/operators/map';
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { map } from "rxjs/internal/operators/map";
+
 
 @Injectable({
   providedIn: 'root'
@@ -14,21 +14,30 @@ export class CalendarService {
     withCredentials: true,
   };    
 
+  private _databaseID!: string;
+
   constructor(private http: HttpClient) { }
 
-  week(login : {username: string, password: string}) {
-
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/x-www-form-urlencoded'
-      })
-    };    
-
+  synchronize(payload : any) {
     let formData = new HttpParams({
-      fromObject: login
+      fromObject: payload
     });
+    return this.http.post("http://localhost:8080/synchronize", formData, this.httpOptions);
+  }
 
+  public get database() {
+    return this.http.get("http://localhost:8080/api/database", this.httpOptions);
+  }
 
-    return this.http.post("http://localhost:8080/week", formData, httpOptions).subscribe(res => console.log);
+  public set databaseID(v: any) {
+    this._databaseID = v;
+  }
+
+  public get databaseID() {
+    return this._databaseID;
+  }
+
+  public get allPages() {
+    return this.http.get("http://localhost:8080/api/allPages", this.httpOptions).pipe(map(response=>response));
   }
 }
