@@ -89,11 +89,12 @@ app.get("/api/allPages", async (req, res) => {
   let output = [];
   // res.json(pages);
   for (const page of pages.results) {
-    if (page.properties.title)
+        if (page.properties.title)
       output.push({
         id: page.id,
-        title: page.properties.title ? page.properties.title.title[0].plain_text : 'No Title',
+        title: page.properties.title.title[0] ? page.properties.title.title[0].plain_text : 'Sans Titre',
         icon: page.icon ? page.icon.emoji : undefined,
+        workspace: page.parent.workspace,
       });
   }
   res.json({result: output});
@@ -107,7 +108,7 @@ app.get("/api/database", async (req, res) => {
 
 app.post("/synchronize", async (req, res) => {
   console.log(res.locals);
-  if (req.body.parent_id) {
+  if (req.body.parent_id === undefined || req.body.parent_id === '') {
     res.sendStatus(400);
     return;
   }
