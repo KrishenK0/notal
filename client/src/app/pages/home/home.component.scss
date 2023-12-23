@@ -5,8 +5,8 @@
 .features {
     &-container {
         &-card {
-            @apply shadow-xl flex flex-col items-center px-8 py-12;
-            
+            @apply min-h-[17em] shadow-xl flex flex-col items-center px-8 py-12;
+
             &-icon {
                 @apply rounded-full p-6 w-fit;
             }

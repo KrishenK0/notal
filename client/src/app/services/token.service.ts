@@ -18,7 +18,7 @@ export class TokenService {
       next: (data: any) => {
         localStorage.setItem(environment.TOKEN_KEY, this.encrypt(JSON.stringify(data['owner']['user'])));
         this.cookieService.set(environment.AUTHID_KEY, data['access_token']);
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl('/calendar');
       },
       error: (e: any) => this.router.navigateByUrl('/')
     });
