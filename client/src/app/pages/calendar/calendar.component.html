@@ -1,72 +1,120 @@
-<ng-container *ngIf="database$ | async as database_id">
+<ng-container *ngIf="database$ | async as database_id; else loading">
   <ng-container *ngIf="view === '' && database_id.result == false">
-    <div *ngIf="allPages$ | async as pages; else loading">
-      <div class="w-auto h-full flex justify-center items-center">
-        <div class="w-full max-w-xs bg-white shadow rounded px-8 pt-6 pb-8 mb-4">
-          <h2 class="text-xl font-bold mb-4">Please choose the parent page of the database.</h2>
+    <div *ngIf="allPages$ | async as pages; else loading" class="flex items-center justify-center w-auto h-full">
+      <div class="w-full max-w-xs px-8 pt-6 pb-8 mb-4 bg-white rounded shadow-md">
+        <h2 class="mb-4 text-xl font-bold">Choisi où le calendrier va être</h2>
           <form>
-              <select name="parent" id="" class="w-full" [(ngModel)]="parent">
-                <ng-container *ngFor="let page of pages.result;">
-                    <option [value]="page.id"><span>{{ page.icon }}</span> {{ page.title }}</option>
-                </ng-container>
-              </select>
-              <button class="btn-primary" type="submit" (click)="changeView('alcuin')">Choose</button>
-          </form>
-        </div>
+            <select name="parent" id="" class="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1.5 mb-2" [(ngModel)]="parent">
+              <option value="" hidden selected disabled>Selectionnez une page</option>
+              <ng-container *ngFor="let page of pages.result;">
+                <option [value]="page.id"><span>{{ page.icon }}</span> {{ page.title }} <span *ngIf="page.workspace">(workspace)</span></option>
+              </ng-container>
+            </select>
+            <button *ngIf="parent != ''" class="btn-primary" type="submit" (click)="changeView('type')">Valider</button>
+        </form>
       </div>
     </div>
-    <ng-template #loading>
-      <p>Loading...</p>
-    </ng-template>
   </ng-container>
 </ng-container>
 
-<div *ngIf="view === 'type'" class="w-auto h-full flex flex-col justify-center items-center">
-  <h1 class="text-lg font-bold mb-8">Please select the range of synchronization</h1>
-  <div class="text-center flex flex-row gap-x-8">
+<div *ngIf="view === 'type'" class="flex flex-col items-center justify-center w-auto h-full">
+  <h1 class="mb-8 text-lg font-bold">Selectionnez le type de synchronisation</h1>
+  <div class="flex flex-row text-center gap-x-8">
     <button (click)="changeType('month')" class="card">
-        <h2 class="font-bold">Month</h2>
-        <p>Synchronize the current month</p>
+        <h2 class="font-bold">Mois</h2>
+        <p>Synchroniser le mois actuel</p>
     </button>
     <button (click)="changeType('week')" class="card">
-      <h2 class="font-bold">Week</h2>
-      <p>Synchronize the current week</p>
+      <h2 class="font-bold">Semaine</h2>
+      <p>Synchroniser la semaine actuelle</p>
     </button>
   </div>
 </div>
 
-<div *ngIf="view === 'alcuin'" class="w-auto h-full flex justify-center items-center">
-  <div class="w-full max-w-xs bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-    <h2 class="text-xl font-bold">Alcuin login</h2>
+<div *ngIf="view === 'alcuin'" class="flex items-center justify-center w-auto h-full">
+  <div class="w-full max-w-xs px-8 pt-6 pb-8 mb-4 bg-white rounded shadow-md">
+    <h2 class="text-xl font-bold">Identifiant Alcuin</h2>
     <form method="post" (ngSubmit)="onSubmit()" [formGroup]="alForm">
-      <div class="mb-4 mt-2">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
-          Username
+      <div class="mt-2 mb-4">
+        <label class="block mb-2 text-sm font-bold text-gray-700" for="username">
+          Identifiant
         </label>
-        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" formControlName="username" type="text" placeholder="Username">
+        <input class="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline" id="username" formControlName="username" type="text" placeholder="Username">
       </div>
       <div class="mb-3">
-        <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
-          Password
+        <label class="block mb-2 text-sm font-bold text-gray-700" for="password">
+          Mot de passe
         </label>
-        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" formControlName="password" type="password" placeholder="********">
+        <input class="w-full px-3 py-2 mb-3 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline" id="password" formControlName="password" type="password" placeholder="********">
       </div>
       <button class="btn-primary" type="submit">
-        Synchronize
+        Synchroniser
       </button>
     </form>
   </div>
 </div>
 
-<div *ngIf="view === 'success'" class="w-auto h-full flex flex-col justify-center items-center text-center">
-  <div class="w-full max-w-xs rounded px-8 pt-6 pb-8 mb-4">
-    <div class="svg-container flex justify-center mb-4">    
+
+<div *ngIf="view === 'loading'" class="flex flex-col items-center justify-center w-auto h-full text-center">
+  <div class="w-full max-w-md px-8 pt-6 pb-8 mb-4 rounded">
+    <div class="flex justify-center mb-4 svg-container">
+      <!-- By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL -->
+      <svg class="w-28 h-28" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" stroke="#cccc">
+        <g fill="none" fill-rule="evenodd" stroke-width="2">
+          <circle cx="22" cy="22" r="1">
+            <animate attributeName="r" begin="0s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" />
+            <animate attributeName="stroke-opacity" begin="0s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" />
+          </circle>
+          <circle cx="22" cy="22" r="1">
+            <animate attributeName="r" begin="-0.9s" dur="1.8s" values="1; 20" calcMode="spline" keyTimes="0; 1" keySplines="0.165, 0.84, 0.44, 1" repeatCount="indefinite" />
+            <animate attributeName="stroke-opacity" begin="-0.9s" dur="1.8s" values="1; 0" calcMode="spline" keyTimes="0; 1" keySplines="0.3, 0.61, 0.355, 1" repeatCount="indefinite" />
+          </circle>
+        </g>
+      </svg>
+    </div>
+    <h2 class="text-lg font-bold">En cours de traitement...</h2>
+    <p id="random">{{randomPhrase}}</p>
+  </div>
+</div>
+
+<div *ngIf="view === 'success'" class="flex flex-col items-center justify-center w-auto h-full text-center">
+  <div class="w-full max-w-xs px-8 pt-6 pb-8 mb-4 rounded">
+    <div class="flex justify-center mb-4 svg-container">
       <svg class="ft-green-tick" xmlns="http://www.w3.org/2000/svg" height="100" width="100" viewBox="0 0 48 48" aria-hidden="true">
           <circle class="circle" fill="#5bb543" cx="24" cy="24" r="22"/>
           <path class="tick" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M14 27l5.917 4.917L34 17"/>
       </svg>
     </div>
-    <p>Your Notion calendar has been synchronized successfully.</p>
-    <button href="#" routerLink="/" class="btn-primary">Back to the home</button>
+    <p class="mb-4">Votre calendrier Notion a bien été actualisé.</p>
+    <button href="#" routerLink="/" class="btn-primary">Retour au menu</button>
   </div>
 </div>
+
+<ng-template #loading>
+  <div class="flex flex-col items-center justify-center w-auto h-full text-center">
+    <div class="w-full max-w-xs px-8 pt-6 pb-8 mb-4 rounded">
+      <div class="flex justify-center mb-4 svg-container">
+        <!-- By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL -->
+        <svg class="w-28 h-28" width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+              <linearGradient x1="8.042%" y1="0%" x2="65.682%" y2="23.865%" id="a">
+                  <stop stop-color="#fff" stop-opacity="0" offset="0%"/>
+                  <stop stop-color="#fff" stop-opacity=".631" offset="63.146%"/>
+                  <stop stop-color="#fff" offset="100%"/>
+              </linearGradient>
+          </defs>
+          <g fill="none" fill-rule="evenodd">
+            <g transform="translate(1 1)">
+              <path d="M36 18c0-9.94-8.06-18-18-18" id="Oval-2" stroke="#ccc" stroke-width="2">
+                <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="0.9s" repeatCount="indefinite" />
+              </path>
+              <circle fill="#fff" cx="36" cy="18" r="1">
+                <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="0.9s" repeatCount="indefinite" />
+              </circle>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { first } from "rxjs/internal/operators/first";
 import { map } from "rxjs/internal/operators/map";
+import { tap } from "rxjs/internal/operators/tap";
 
 
 @Injectable({
@@ -12,7 +14,8 @@ export class CalendarService {
       'Content-Type':  'application/x-www-form-urlencoded'
     }),
     withCredentials: true,
-  };    
+  };
+
 
   private _databaseID!: string;
 
@@ -34,6 +37,13 @@ export class CalendarService {
   }
 
   public get databaseID() {
+    if (this._databaseID === undefined) {
+      let sub = this.database.pipe(first(), tap((v:any) => {
+        if (v.result != false) {
+          this.databaseID = v.result;
+        }
+      })).subscribe((data:any) => sub.unsubscribe());
+    }
     return this._databaseID;
   }
 
