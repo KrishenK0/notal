@@ -4,7 +4,7 @@
   "description": "Public Notion intergration using Express.js for a server.",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon alcuin.js"
+    "start": "nodemon server.js"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.13",
