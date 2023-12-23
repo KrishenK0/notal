@@ -343,8 +343,8 @@ function extractCalData(cal, date) {
 
     const startDate = new Date(date);
     const endDate = new Date(date);
-  startDate.setHours(parseInt(startTime[0])+2, startTime[1], 0, 0);
-  endDate.setHours(parseInt(endTime[0])+2, endTime[1], 0, 0);
+    startDate.setHours(parseInt(startTime[0]) + 1, startTime[1], 0, 0);
+    endDate.setHours(parseInt(endTime[0]) + 1, endTime[1], 0, 0);
 
     // console.log(courseTime, {endTime: endTime, endDate: endDate.toISOString()}, {startTime: startTime, startDate: startDate.toISOString()})
 
