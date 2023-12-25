@@ -166,6 +166,6 @@ app.get("/calendar", async (request, response) => {
   response.json(await main(process.env.LOGIN, process.env.PASS));
 });
 
-app.listen(process.env.PORT || 5000, function () {
+const listener = app.listen(process.env.PORT || 5000, function () {
   console.log("Your app is listening on port " + listener.address().port)
 });
