@@ -6,6 +6,7 @@ const express = require("express")
 const app = express()
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const serverless = require('serverless-http');
 const { Worker, isMainThread, parentPort } = require('worker_threads');
 var winston = require('winston'),
     expressWinston = require('express-winston');
@@ -166,4 +167,6 @@ app.get("/calendar", async (request, response) => {
   response.json(await main(process.env.LOGIN, process.env.PASS));
 });
 
-module.exports = app;
+app.listen(process.env.PORT || 5000, function () {
+  console.log("Your app is listening on port " + listener.address().port)
+});

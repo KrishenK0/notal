@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "build": "npm i"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.13",
