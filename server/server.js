@@ -12,9 +12,15 @@ var winston = require('winston'),
 
 app.use(cors(({
   credentials: true, 
-  origin: ["https://notal-esaip.vercel.app/","http://localhost:4200"],
+  origin: "*",
   optionsSuccessStatus: 200 // For legacy browser support
 })));
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  next();
+})
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressWinston.logger({
   transports: [
