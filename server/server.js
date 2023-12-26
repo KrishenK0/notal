@@ -10,7 +10,11 @@ const { Worker, isMainThread, parentPort } = require('worker_threads');
 var winston = require('winston'),
     expressWinston = require('express-winston');
 
-app.use(cors(({credentials: true, origin: 'http://localhost:4200'})));
+app.use(cors(({
+  credentials: true, 
+  origin: ["https://notal-esaip.vercel.app/","http://localhost:4200"],
+  optionsSuccessStatus: 200 // For legacy browser support
+})));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressWinston.logger({
   transports: [
