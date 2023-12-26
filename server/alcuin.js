@@ -21,11 +21,11 @@ async function t() {
             .type("application/json")
             .set({
                 "Notion-Version": "2022-06-28",
-                'Authorization': `Basic ${encoded}`
+                'Authorization': `Bearer ${encoded}`
             }).send({
                 grant_type: "authorization_code",
                 code: workerData.code,
-                redirect_uri: "http://localhost:4200/login",
+                redirect_uri: "https://notal-esaip.vercel.app/login",
             })
             .then(data => {return JSON.parse(data.text)})
             .catch(data => {return JSON.parse(data.response.text)});

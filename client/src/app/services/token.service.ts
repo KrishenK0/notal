@@ -13,19 +13,23 @@ export class TokenService {
   constructor(private http: HttpClient, private cookieService: CookieService, private router: Router) { }
 
   getToken(token: string) {
-    return this.http.get(`http://127.0.0.1:8080/auth?code=${token}`, )
+    return this.http.get(`${environment.API_URL}/auth?code=${token}`, )
     .subscribe({
       next: (data: any) => {
         localStorage.setItem(environment.TOKEN_KEY, this.encrypt(JSON.stringify(data['owner']['user'])));
         this.cookieService.set(environment.AUTHID_KEY, data['access_token']);
-        this.router.navigateByUrl('/calendar');
+        this.router.navigateByUrl('/');
       },
       error: (e: any) => this.router.navigateByUrl('/')
     });
   }
 
+  getAuthToken() {
+    return this.cookieService.get(environment.AUTHID_KEY);
+  }
+
   isLogged() {
-    return this.cookieService.get(environment.AUTHID_KEY) != undefined && this.cookieService.get(environment.AUTHID_KEY) != "";
+    return localStorage.getItem(environment.TOKEN_KEY) != undefined && localStorage.getItem(environment.TOKEN_KEY) != "";
   }
 
   logout() {

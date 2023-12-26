@@ -26,23 +26,12 @@ app.use(expressWinston.logger({
   colorize: false,
   ignoreRoute: function (req, res) { return false; }
 }));
-app.use((req, res, next) => {
-  const { headers: { cookie } } = req;
-  if (cookie) {
-      const values = cookie.split(';').reduce((res, item) => {
-          const data = item.trim().split('=');
-          return { ...res, [data[0]]: data[1] };
-      }, {});
-      res.locals.cookie = values;
-  }
-  else res.locals.cookie = {};
-  next();
-});
 app.use('/api/*', (req, res, next) => {
-  if (res.locals.cookie['user-id'] === undefined) {
+  if (req.headers.authorization.split(' ')[1] === undefined) {
     res.sendStatus(401);
     return;
-  }
+  } 
+  res.locals.authorization = req.headers.authorization.split(' ')[1];
   next();
 })
 
@@ -63,6 +52,7 @@ app.get("/auth", async (req, res) => {
 
     worker.on('message', (message) => {
       console.log(message);
+      res.cookie('token', message['access_token'], {maxAge: 900000, sameSite: 'Lax' })
       res.json(message);
     });
 
@@ -81,7 +71,7 @@ app.get("/api/allPages", async (req, res) => {
   const worker = new Worker('./alcuin.js', {
     workerData: {
       action: 'allPages',
-      cookie: res.locals.cookie['user-id'],
+      cookie: res.locals.authorization,
     }
   });
 
@@ -100,7 +90,7 @@ app.get("/api/database", async (req, res) => {
   const worker = new Worker('./alcuin.js', {
     workerData: {
       action: 'database',
-      cookie: res.locals.cookie['user-id'],
+      cookie: res.locals.authorization,
     }
   });
 
@@ -124,7 +114,7 @@ app.post("/synchronize", async (req, res) => {
   const worker = new Worker('./alcuin.js', {
     workerData: {
       action: 'sync',
-      cookie: res.locals.cookie['user-id'],
+      cookie: res.locals.authorization,
       username: req.body.username,
       password: req.body.password,
       parent_id: req.body.parent_id,

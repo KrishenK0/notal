@@ -3,6 +3,8 @@ import { Injectable } from "@angular/core";
 import { first } from "rxjs/internal/operators/first";
 import { map } from "rxjs/internal/operators/map";
 import { tap } from "rxjs/internal/operators/tap";
+import { TokenService } from "./token.service";
+import { environment } from "src/environment.prod";
 
 
 @Injectable({
@@ -11,7 +13,8 @@ import { tap } from "rxjs/internal/operators/tap";
 export class CalendarService {
   httpOptions = {
     headers: new HttpHeaders({
-      'Content-Type':  'application/x-www-form-urlencoded'
+      'Content-Type':  'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${this.token.getAuthToken()}`
     }),
     withCredentials: true,
   };
@@ -19,17 +22,17 @@ export class CalendarService {
 
   private _databaseID!: string;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private token: TokenService) { }
 
   synchronize(payload : any) {
     let formData = new HttpParams({
       fromObject: payload
     });
-    return this.http.post("http://localhost:8080/synchronize", formData, this.httpOptions);
+    return this.http.post(`${environment.API_URL}/synchronize`, formData, this.httpOptions);
   }
 
   public get database() {
-    return this.http.get("http://localhost:8080/api/database", this.httpOptions);
+    return this.http.get(`${environment.API_URL}/api/database`, this.httpOptions);
   }
 
   public set databaseID(v: any) {
@@ -48,6 +51,6 @@ export class CalendarService {
   }
 
   public get allPages() {
-    return this.http.get("http://localhost:8080/api/allPages", this.httpOptions).pipe(map(response=>response));
+    return this.http.get(`${environment.API_URL}/api/allPages`, this.httpOptions).pipe(map(response=>response));
   }
 }
