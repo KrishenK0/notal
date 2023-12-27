@@ -37,7 +37,7 @@ app.use(expressWinston.logger({
   ignoreRoute: function (req, res) { return false; }
 }));
 app.use('/api/*', (req, res, next) => {
-  if (req.headers.authorization.split(' ')[1] === undefined) {
+  if (req.headers.authorization == undefined || req.headers.authorization.split(' ')[1] === undefined) {
     res.sendStatus(401);
     return;
   } 
@@ -115,7 +115,7 @@ app.get("/api/database", async (req, res) => {
   });
 })
 
-app.post("/synchronize", async (req, res) => {
+app.post("/api/synchronize", async (req, res) => {
   if (req.body.parent_id === undefined || req.body.parent_id === '') {
     res.sendStatus(400);
     return;

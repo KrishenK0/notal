@@ -4,7 +4,7 @@ import { first } from "rxjs/internal/operators/first";
 import { map } from "rxjs/internal/operators/map";
 import { tap } from "rxjs/internal/operators/tap";
 import { TokenService } from "./token.service";
-import { environment } from "src/environment.prod";
+import { environment } from "../../environment";
 
 
 @Injectable({
@@ -27,7 +27,7 @@ export class CalendarService {
     let formData = new HttpParams({
       fromObject: payload
     });
-    return this.http.post(`${environment.API_URL}/synchronize`, formData, this.httpOptions);
+    return this.http.post(`${environment.API_URL}/api/synchronize`, formData, this.httpOptions);
   }
 
   public get database() {
