@@ -21,7 +21,7 @@ async function t() {
             .type("application/json")
             .set({
                 "Notion-Version": "2022-06-28",
-                'Authorization': `Bearer ${encoded}`
+                'Authorization': `Basic ${encoded}`
             }).send({
                 grant_type: "authorization_code",
                 code: workerData.code,
