@@ -15,8 +15,7 @@ export class CalendarService {
     headers: new HttpHeaders({
       'Content-Type':  'application/x-www-form-urlencoded',
       'Authorization': `Basic ${this.token.getAuthToken()}`
-    }),
-    withCredentials: true,
+    })
   };
 
 
