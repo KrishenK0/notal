@@ -25,7 +25,7 @@ async function t() {
             }).send({
                 grant_type: "authorization_code",
                 code: workerData.code,
-                redirect_uri: "https://notal-esaip.vercel.app/login",
+                redirect_uri: `${workerData.redirect}/login`,
             })
             .then(data => {return JSON.parse(data.text)})
             .catch(data => {return JSON.parse(data.response.text)});

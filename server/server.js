@@ -57,6 +57,7 @@ app.get("/auth", async (req, res) => {
       workerData: {
         action: 'login',
         code: req.query["code"],
+        redirect: req.headers['origin'],
       }
     });
 
