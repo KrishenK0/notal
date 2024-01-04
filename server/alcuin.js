@@ -7,8 +7,6 @@ const superagent = require('superagent').agent();
 const { Client } = require("@notionhq/client");
 const cheerio = require('cheerio');
 
-console.log(workerData);
-
 t().then(res => parentPort.postMessage(res));
 
 async function t() {
@@ -82,7 +80,6 @@ async function t() {
 
 
 async function getOrCreateDatabaseId(token, parent_id) {
-    console.log(token);
     notion = new Client({ auth: token });
     if (parent_id === undefined) {
         const searchPageId = await notion.search({ filter: { property: "object", value: "page" } });
@@ -234,7 +231,6 @@ async function main(LOGIN, PASS, days, initDate) {
 
     let cal, datas = [];
     let date = prevDate = new Date(initDate ?? Date.now());
-    console.log(date);
     initDate === undefined && date.setDate(date.getDate() - date.getDay());
 
     for (let i = 0; i < days; i++) {

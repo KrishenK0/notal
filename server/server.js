@@ -62,7 +62,6 @@ app.get("/auth", async (req, res) => {
     });
 
     worker.on('message', (message) => {
-      console.log(message);
       res.cookie('token', message['access_token'], {maxAge: 900000, sameSite: 'Lax' })
       res.json(message);
     });
@@ -87,7 +86,6 @@ app.get("/api/allPages", async (req, res) => {
   });
 
   worker.on('message', (message) => {
-    console.log(message);
     res.json({result: message});
   });
 
@@ -106,7 +104,6 @@ app.get("/api/database", async (req, res) => {
   });
 
   worker.on('message', (message) => {
-    console.log(message);
     res.json(message);
   });
 
@@ -134,7 +131,6 @@ app.post("/api/synchronize", async (req, res) => {
   });
 
   worker.on('message', (message) => {
-    console.log(message);
     res.json(message);
   });
 
