@@ -13,7 +13,7 @@ export class TokenService {
   constructor(private http: HttpClient, private cookieService: CookieService, private router: Router) { }
 
   getToken(token: string) {
-    return this.http.get(`https://notal.onrender.com/auth?code=${token}`, )
+    return this.http.get(`${environment.API_URL}/auth?code=${token}`, )
     .subscribe({
       next: (data: any) => {
         localStorage.setItem(environment.TOKEN_KEY, this.encrypt(JSON.stringify(data['owner']['user'])));

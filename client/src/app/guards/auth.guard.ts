@@ -3,6 +3,7 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTr
 import { Observable } from 'rxjs';
 import { TokenService } from '../services/token.service';
 import { DOCUMENT } from '@angular/common';
+import { environment } from 'src/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class AuthGuard implements CanActivate {
 constructor(private token: TokenService, @Inject(DOCUMENT) private document: Document) { }
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     if (!this.token.isLogged()) {
-      window.location.href = 'https://www.notion.so/install-integration?response_type=code&client_id=f8844f66-125d-48b4-90ce-a2a091e945a0&redirect_uri=https%3A%2F%2Fnotal-esaip.vercel.app%2Flogin&owner=user';
+      window.location.href = environment.REDIRECT_URL;
       return false;
     }
     return true;
